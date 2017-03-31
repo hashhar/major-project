@@ -5,6 +5,7 @@ example_critic.h5f
 sample_actor.h5f
 sample_critic.h5f
 *#
+*.bup
 # }}}
 
 # Linux+Windows {{{
