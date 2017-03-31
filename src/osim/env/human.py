@@ -60,8 +60,8 @@ class GaitEnv(OsimEnv):
         # self.osim_model.joints.append(opensim.PinJoint.safeDownCast(self.osim_model.jointSet.get(11)))
         # self.osim_model.joints.append(opensim.WeldJoint.safeDownCast(self.osim_model.jointSet.get(12)))
 
-        for i in range(13):
-            print(self.osim_model.bodySet.get(i).getName())
+        #for i in range(13):
+        #    print(self.osim_model.bodySet.get(i).getName())
 
         self.osim_model.bodies.append(self.osim_model.bodySet.get(5))
         self.osim_model.bodies.append(self.osim_model.bodySet.get(10))
