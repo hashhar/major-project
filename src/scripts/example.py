@@ -31,7 +31,7 @@ elif args.environment == "HopEnv":
     env = HopEnv(args.visualize)
 elif args.environment == "CrouchEnv":
     env = CrouchEnv(args.visualize)
-else
+else:
     exit()
 
 nb_actions = env.action_space.shape[0]

@@ -1,5 +1,4 @@
 import opensim
-import math
 import numpy as np
 import os
 from .osim import OsimEnv
@@ -25,7 +24,7 @@ class GaitEnv(OsimEnv):
     def getPelvis(self):
         return self.osim_model.bodies[3].getTransformInGround(self.osim_model.state).p()
 
-    def compute_reward(self):        
+    def compute_reward(self):
         delta = self.current_state[2] - self.last_state[2]
 
         return delta
@@ -33,7 +32,7 @@ class GaitEnv(OsimEnv):
     def is_pelvis_too_low(self):
         y = self.osim_model.joints[0].getCoordinate(2).getValue(self.osim_model.state)
         return (y < 0.7)
-    
+
     def is_done(self):
         return self.is_pelvis_too_low()
 
@@ -68,6 +67,10 @@ class GaitEnv(OsimEnv):
         self.osim_model.bodies.append(self.osim_model.bodySet.get(12))
         self.osim_model.bodies.append(self.osim_model.bodySet.get(0))
 
+        self.lforig = self.getFootL()
+        self.rforig = self.getFoorR()
+        self.horig = self.getHead()
+
     def get_observation(self):
         invars = np.array([0] * self.ninput, dtype='f')
 
@@ -88,7 +91,7 @@ class GaitEnv(OsimEnv):
 
         pos = self.osim_model.model.calcMassCenterPosition(self.osim_model.state)
         vel = self.osim_model.model.calcMassCenterVelocity(self.osim_model.state)
-        
+
         invars[19] = pos[0]
         invars[20] = pos[1]
 
@@ -114,7 +117,7 @@ class GaitEnv(OsimEnv):
 
 
         self.current_state = invars
-        
+
         # for i in range(0,self.ninput):
         #     invars[i] = self.sanitify(invars[i])
 
@@ -134,6 +137,39 @@ class StandEnv(GaitEnv):
         rew = 50.0 - min(a,10.0) - min(v,40.0)
 
         return rew / 50.0
+
+    def compute_reward_alt(self):
+        y = self.osim_model.joints[0].getCoordinate(2).getValue(self.osim_model.state)
+        x = self.osim_model.joints[0].getCoordinate(1).getValue(self.osim_model.state)
+
+        pos = self.osim_model.model.calcMassCenterPosition(self.osim_model.state)
+        vel = self.osim_model.model.calcMassCenterVelocity(self.osim_model.state)
+        acc = self.osim_model.model.calcMassCenterAcceleration(self.osim_model.state)
+        acc_com = 0.0
+        for a in acc:
+            acc_com += a**2
+
+        vel_com = 0.0
+        for v in vel:
+            vel_com += v**2
+
+        legvel_com = self.osim_model.joints[0].getCoordinate(0).getSpeedValue(self.osim_model.state)**2 + self.osim_model.joints[1].getCoordinate(0).getSpeedValue(self.osim_model.state)**2
+
+        sum_com = 0.0
+        h = self.getHead()
+        lf = self.getFootL()
+        rf = self.getFootR()
+        deltah = 0.0
+        deltalf = 0.0
+        deltarf = 0.0
+        for i in range(2):
+            deltah += abs(h[i] - self.horig[i])
+            deltalf += abs(lf[i] - self.lforig[i])
+            deltarf += abs(rf[i] - self.rforig[i])
+
+        sum_com += deltah**2 + deltalf + deltarf
+        rew = 100.0 - acc_com - 2 * vel_com - sum_com - (legvel_com / 100)
+        return rew / 100.0
 
 class HopEnv(GaitEnv):
     def __init__(self, visualize = True):
