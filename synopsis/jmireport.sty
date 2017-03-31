@@ -1,0 +1,191 @@
+\ProvidesPackage{jmireport}
+
+% Packages
+\usepackage{titlesec} % Change title formats
+\usepackage{fontspec} % Use TTF fonts
+\usepackage{graphicx} % Images
+% \usepackage{tabularx} % Tables
+\usepackage{float} % Figures
+\usepackage{pdfpages}
+\usepackage[english]{babel} % datetime depends on it
+\usepackage[ddmmyyyy]{datetime} % Dates
+\usepackage{parskip} % No indent paragraphs
+\usepackage{xstring} % Used for making templabels
+\usepackage{suffix} % Define star commands
+\usepackage{xcolor} % Define colours
+\usepackage{soul} % Highlighting
+\usepackage{mathtools} % Maths
+\usepackage{amsfonts} % Number set fonts
+\usepackage{hyperref} % Hyperreferences and URLs
+\usepackage{geometry} % Layout
+\usepackage{multirow} % multirow tables
+\usepackage{listings}
+\usepackage{ltablex} % Long tabularx
+\usepackage{ifplatform} % Fonts according to OS
+\keepXColumns
+
+% Set geometry
+% \geometry{a4paper, portrait, left=1.5in, right=1.5in, top=1.5in, bottom=1.5in}
+
+% Allow more sloppy line breaks to prevent overfills
+\setlength{\emergencystretch}{12pt}
+
+% Fonts
+\defaultfontfeatures{Ligatures=TeX} % Enable ligatures like --, `' etc.
+\ifwindows
+    \setmainfont{Times New Roman} % Roman font
+    \setsansfont{Segoe UI} % Sans Serif font
+    \setmonofont{Consolas} % Monospace font
+\else
+    \setmonofont{Consolas}
+\fi
+
+% Font sizes
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+\newcommand{\chapfnt}{\fontsize{28pt}{32pt}}
+\newcommand{\secfnt}{\fontsize{16pt}{19pt}}
+\newcommand{\ssecfnt}{\fontsize{14pt}{17pt}}
+\newcommand{\exfnt}{\fontsize{10pt}{12pt}}
+
+\titleformat{\chapter}[block]
+{\normalfont\chapfnt\bfseries\centering}{}{0pt}{\chapfnt}
+
+\titleformat{\section}
+{\normalfont\secfnt\bfseries\centering}{\thesection}{1em}{}
+
+\titleformat{\subsection}
+{\normalfont\ssecfnt\bfseries}{\thesubsection}{1em}{}
+
+\titleformat{\subsubsection}
+{\normalfont\ssecfnt\bfseries}{\thesubsubsection}{1em}{}
+
+\titlespacing*{\chapter} {0pt}{0pt}{2\baselineskip}
+\titlespacing*{\section} {0pt}{1\baselineskip plus 1ex minus .2ex}{.5\baselineskip plus .2ex}
+\titlespacing*{\subsection} {0pt}{1\baselineskip plus 1ex minus .2ex}{.5\baselineskip plus .2ex}
+\titlespacing*{\subsubsection} {0pt}{1\baselineskip plus 1ex minus .2ex}{.5\baselineskip plus .2ex}
+
+% Environments
+\newenvironment{chaptersize}
+{%
+    \fontsize{28pt}{32pt}\selectfont
+}
+{%
+}
+
+\newenvironment{sectionsize}
+{%
+    \fontsize{16pt}{19pt}\selectfont
+}
+{%
+}
+
+\newenvironment{subsectionsize}
+{%
+    \fontsize{14pt}{17pt}\selectfont
+}
+{%
+}
+
+% Paragraph formatting
+\setlength{\parindent}{0pt}
+
+\restylefloat{figure}
+
+% Colours
+\definecolor{light-gray}{gray}{0.95}
+
+% Variables
+% Dates
+\newdate{datePublished}{19}{12}{2016}
+
+% Formatting
+% \newcommand{\ex}[1]{\colorbox{light-gray}{\exfnt{\texttt{#1}}}}
+\sethlcolor{light-gray}
+\newcommand{\ex}[1]{\hl{\mbox{\exfnt{\texttt{#1}}}}}
+
+\newcommand{\chapterLabel}[1]{%
+    \clearpage
+    \lowercase{\def\templabel{#1}}
+    \StrSubstitute{\templabel}{ }{-}[\templabel]
+    \chapter{#1}\label{ch:\templabel}
+}
+
+\WithSuffix\newcommand\chapterLabel*[1]{%
+    \clearpage
+    \lowercase{\def\templabel{#1}}
+    \StrSubstitute{\templabel}{ }{-}[\templabel]
+    \chapter*{#1}\label{ch:\templabel}
+    \addcontentsline{toc}{chapter}{#1}
+}
+
+\newcommand{\sectionLabel}[1]{%
+    \lowercase{\def\templabel{#1}}
+    \StrSubstitute{\templabel}{ }{-}[\templabel]
+    \section{#1}\label{sec:\templabel}
+}
+
+\WithSuffix\newcommand\sectionLabel*[1]{%
+    \lowercase{\def\templabel{#1}}
+    \StrSubstitute{\templabel}{ }{-}[\templabel]
+    \section*{#1}\label{sec:\templabel}
+    \addcontentsline{toc}{section}{#1}
+}
+
+\newcommand{\subsectionLabel}[1]{%
+    \lowercase{\def\templabel{#1}}
+    \StrSubstitute{\templabel}{ }{-}[\templabel]
+    \subsection{#1}\label{subsec:\templabel}
+}
+
+\WithSuffix\newcommand\subsectionLabel*[1]{%
+    \lowercase{\def\templabel{#1}}
+    \StrSubstitute{\templabel}{ }{-}[\templabel]
+    \subsection*{#1}\label{subsec:\templabel}
+    \addcontentsline{toc}{subsection}{#1}
+}
+
+% Tables
+% \newcolumntype{R}{>{\raggedleft\arraybackslash}X}
+% \newcolumntype{L}{>{\raggedright\arraybackslash}X}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+\newcolumntype{R}{>{\raggedleft\arraybackslash}X}
+
+% Names
+\newcommand{\reviewerName}{Mr. Danish Raza Rizvi}
+\newcommand{\reviewerPost}{Asst. Professor, \departmentName{}}
+
+\newcommand{\authorAshhar}{Ashhar Hasan}
+\newcommand{\authorAshharRoll}{13BCS-0015}
+
+\newcommand{\authorAbhinav}{Abhinav Rai}
+\newcommand{\authorAbhinavRoll}{13BCS-0005}
+
+\newcommand{\authorsNames}{\authorAshhar{} and \authorAbhinav{}}
+\newcommand{\authorsBold}{\textbf{\authorAshhar{}} and \textbf{\authorAbhinav{}}}
+\newcommand{\authorsItalic}{\textit{\authorAshhar{}} and \textit{\authorAbhinav{}}}
+
+\newcommand{\departmentName}{Department of Computer Engineering}
+\newcommand{\facultyName}{Faculty of Engineering and Technology}
+\newcommand{\collegeName}{Jamia Millia Islamia}
+\newcommand{\cityNamePin}{New Delhi --- 110025}
+
+\newcommand{\projectTitle}{Deep Learning Based Motor Control Unit}
+
+\lstdefinestyle{customc}{
+  belowcaptionskip=1\baselineskip,
+  breaklines=true,
+  frame=L,
+  xleftmargin=\parindent,
+  language=C,
+  showstringspaces=false,
+  basicstyle=\footnotesize\ttfamily,
+  keywordstyle=\bfseries\color{green!40!black},
+  commentstyle=\itshape\color{purple!40!black},
+  identifierstyle=\color{blue},
+  stringstyle=\color{orange},
+}
+
+\lstdefinestyle{sharpc}{language=[Sharp]C}
+
+\lstset{escapechar=@,style=customc}

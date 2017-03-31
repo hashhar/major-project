@@ -1,0 +1,5 @@
+{
+    "reflow.preferredLineLength": 80,
+    "vim.textwidth": 80,
+    "cSpell.enabled": true
+}

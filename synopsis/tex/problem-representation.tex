@@ -1,0 +1,53 @@
+\subsectionLabel*{Problem Representation}
+
+The method consists of a standard reinforcement learning setup consisting of an
+agent interacting with an environment \(E\) in discrete time-steps. At each
+time-step \(t\) the agent receives an observation \(x_t\), takes an action
+\(a_t\) and receives a scalar reward \(r_t\). In all the environments
+considered here the actions are real-valued at \(a_t \in R^N\). In general, the
+environment may be partially observed so that the entire history of the
+observation, action pairs \(s_t = \left(x_1, a_1,\dotsc, a_{t-1}, x_t\right)\)
+may be required to describe the state. Here, we assumed the environment is
+fully-observed so \(s_t = x_t\).
+
+An agent's behaviour is defined by a policy, \(\pi\), which maps states to a
+probability distribution over the actions \(\pi : S \rightarrow P(A)\). The
+environment, \(E\) may also be stochastic. We model it as a Markov decision
+process with a state space \(S\), action space \(A = R^N\), an initial state
+distribution \(p\left(s_1\right)\), transition dynamics \(p\left(s_{t+1} | s_t,
+a_t\right)\), and reward function \(r\left(s_t, a_t\right)\).
+
+The return from a state is defined as the sum of the discounted future reward
+\(R_t = \sum_{i=t}^{T} \gamma^{\left(i - t\right)}r\left(s_i, a_i\right)\) with
+a discounting factor \(\gamma \in {[0, 1]}\). Note that the return depends on
+the actions chosen, and therefore on the policy, and may be stochastic. The
+goal in reinforcement learning is to learn a policy which maximizes the
+expected return from the start distribution \(J = \mathbb{E}_{r_i, s_i \sim E,
+a_i \sim \pi}\left[R_1\right]\). We denote the discounted state visitation
+distribution for a policy \(\pi\) as \(\rho^\pi\).
+
+The action value function is used in many reinforcement learning algorithms. It
+describes the expected return after taking an action \(a_t\) in state \(s_t\)
+and thereafter following policy \(\pi : Q^\pi\left(s_t, a_t\right) =
+\mathbb{E}_{r_{i \geq t}, s_{i > t} \sim E, a_{i > t} \sim \pi} \left[R_t |
+s_t, a_t\right]\). Many approaches in reinforcement learning make use of the
+recursive relationship known as the Bellman equation:
+
+\begin{equation}
+    Q^\pi\left(s_t, a_t\right) = \mathbb{E}_{r_t, s_{t + 1} \sim E}
+    \left[r\left(s_t, a_t\right) + \gamma\mathbb{E}_{a_{t + 1} \sim \pi}
+    \left[Q^\pi\left(s_{t + 1}, a_{t + 1}\right)\right]\right]
+\end{equation}
+
+If the target policy is deterministic we can describe it as a function \(\mu :
+S \leftarrow A\) and avoid the inner expectation:
+
+\begin{equation}
+    Q^\mu\left(s_t, a_t\right) = \mathbb{E}_{r_t, s_{t + 1} \sim E}
+    \left[r\left(s_t, a_t\right) + \gamma Q^\mu\left(s_{t + 1}, \mu\left(s_{t +
+    1}\right)\right)\right]
+\end{equation}
+
+The expectation depends only on the environment. This means that it is possible
+to learn \(Q^\mu\) off-policy, using transitions which are generated from a
+different stochastic behaviour policy \(\beta\).

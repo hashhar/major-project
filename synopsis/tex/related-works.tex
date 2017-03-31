@@ -1,0 +1,35 @@
+\sectionLabel*{Related Work}
+
+Methods for physics-based character animation that use forward dynamic
+simulations have been a research focus for over two decades, most often with
+human locomotion as the motion of interest. A survey of the work in this area
+can be found in \cite{geijtenbeek2012interactive}. Impressive results were
+achieved in classical works by \cite{coros2011locomotion},
+\cite{wang2012optimizing} and \cite{geijtenbeek2013flexible}. But most of these
+works focus on controlling physics-based locomotion over flat terrain. Recently
+there have been some very interesting attempts to use deep reinforcement
+learning for locomotion on complex terrain, for example \cite{peng2016terrain},
+but only in 2D at the moment. Another interesting approach using biologically
+inspired idea that motor systems are hierarchical was suggested in
+\cite{geijtenbeek2012interactive}. Animation researchers have been interested
+in the control of locomotion for 3D humanoid characters for almost 20 years.
+One important recent contribution is \emph{SIMBICON} \cite{yin2007simbicon}, a
+remarkably robust 3D humanoid locomotion controller based on the balance
+control of \cite{raibert1991animation}. A number of projects have since focused
+on expanding the controller repertoire for simulated bipeds and on locomotion
+in complex environments. At the same time, efforts have been made to make the
+synthesized motions more human-like, or ``natural''. The original
+\emph{SIMBICON}-style controllers tend to produce gaits lacking hip extension
+with a constant foot orientation. Knee angles lack flexion during swing, but
+lack extension at heel strike. More recent controllers improve motions by
+designing better target trajectories in joint or feature space. While more
+human-like ankle motions have been produced, differences in the hip and knee
+angles persist. Perhaps more importantly, controllers relying on hand-tuned
+trajectories cannot be easily used to investigate how the control strategies
+change with respect to new constraints. For example, how would the character's
+motion style change given a physical disability? Can we synthesize appropriate
+gaits for older or younger characters? Impressive results have also been
+achieved by controllers based on tracking motion capture data as in
+\cite{da2008interactive} and \cite{ye2010optimal}. However, as with methods
+that tune joint trajectories or controller parameters by hand, motion capture
+driven controllers have a limited ability to predict changes in gait.

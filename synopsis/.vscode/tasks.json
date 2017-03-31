@@ -1,0 +1,104 @@
+{
+	// See https://go.microsoft.com/fwlink/?LinkId=733558
+	// for the documentation about the tasks.json format
+	"version": "0.1.0",
+	"linux": {
+		"command": "bash",
+		"isShellCommand": true,
+		"args": ["-c"],
+		"showOutput": "silent",
+		"suppressTaskName": true
+	},
+	"windows": {
+		"command": "cmd",
+		"isShellCommand": true,
+		"args": ["/C"],
+		"showOutput": "silent",
+		"suppressTaskName": true
+	},
+	"tasks":[
+		{
+			"taskName": "pdf",
+			"echoCommand": true,
+			"args": [
+				"latexmk",
+				"-xelatex",
+				"-bibtex",
+				"-pdf",
+				"${workspaceRoot}/synopsis.tex"
+			],
+			"isBuildCommand": true
+		},
+		{
+			"taskName": "clean",
+			"args": [
+				"latexmk",
+				"-xelatex",
+				"-bibtex",
+				"-c"
+			]
+		},
+		{
+			"taskName": "full clean",
+			"args": [
+				"latexmk",
+				"-xelatex",
+				"-bibtex",
+				"-C"
+			]
+		},
+		{
+			"taskName": "watch",
+			"echoCommand": true,
+			"args": [
+				"latexmk",
+				"-xelatex",
+				"-pdf",
+				"-pvc",
+				"${workspaceRoot}/synopsis.tex"
+			]
+		},
+		{
+			"taskName": "lacheck",
+			"args": [
+				"lacheck",
+				"${file}"
+			],
+			"problemMatcher": {
+				"owner": "latex",
+				"fileLocation": "absolute",
+				"pattern": {
+					"regexp": "^\"(.*)\", line (\\d+): (.*)$",
+					"file": 1,
+					"line": 2,
+					"message": 3
+				},
+				"severity": "warning"
+			}
+		},
+		{
+			"taskName": "chktex",
+			"isTestCommand": true,
+			"isWatching": true,
+			"args": [
+				"chktex",
+				"-v0",
+				"-q",
+				"${file}",
+				"-n36"
+			],
+			"problemMatcher": {
+				"owner": "latex",
+				"fileLocation": "absolute",
+				"pattern": {
+					"regexp": "^(.*):(\\d+):(\\d+):(\\d+):(.*)$",
+					"file": 1,
+					"line": 2,
+					"column": 3,
+					"message": 5
+				},
+				"severity": "warning"
+			}
+		}
+	]
+}

@@ -1,0 +1,43 @@
+\sectionLabel*{Introduction}
+
+The development of physics-based locomotion controllers, independent from
+captured motion data, has been a long-standing objective in computer graphics
+and robotics research and recently in biomechanical communities. In robotics
+with the help of reinforcement learning instead of expensive and complex
+explicit programming robots can teach themselves how to move in virtual spaces
+and real environments like in \cite{heess2016learning}.
+
+In biomechanics research a lot of models have been developed to fit the
+clinical data to understand underlying causes of injuries using inverse
+kinematics and inverse dynamics. For many of these models there are controllers
+designed for forward simulations of movement, however they are often finely
+tuned for the model and data. Applying reinforcement learning to this task may
+allow building more robust controllers for large number of tasks.
+
+The use of reinforcement learning together with physics-based simulations
+offers the enticing prospect of developing classes of motion skills from first
+principles. This requires viewing the problem through the lens of a sequential
+decision problem involving states, actions, rewards, and a control policy.
+Given the current situation of the character, as captured by the state, the
+control policy decides on the best action to take, and this then results in a
+subsequent state, as well as a reward that reflects the desirability of the
+observed state transition. The goal of the control policy is to maximize the
+sum of expected future rewards, i.e., any immediate rewards as well as all
+future rewards.
+
+In practice, a number of challenges need to be overcome when applying the
+reinforcement learning framework to problems with continuous and
+high-dimensional states and actions, as required by movement skills. A control
+policy needs to select the best actions for the distribution of states that
+will be encountered, but this distribution is often not known in advance.
+Similarly, the distribution of actions that will prove to be useful for these
+states is also rarely known in advance. Furthermore, the state and action
+distributions are not static in nature; as changes are made to the control
+policy, new states may be visited, and, conversely, the best possible policy
+may change as new actions are introduced. It is also not obvious how to best
+represent the state of a character and its environment. Using large descriptors
+allows for very general and complete descriptions, but such high-dimensional
+descriptors define large state spaces that pose a challenge for many
+reinforcement learning methods. Using sparse descriptors makes the learning
+more manageable, but requires domain knowledge to design an informative and
+compact feature set that may nevertheless be missing important information.
