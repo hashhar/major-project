@@ -1,36 +1,38 @@
-# Derived from keras-rl
-import opensim as osim
-import numpy as np
-import sys
-
 from keras.models import Sequential, Model
 from keras.layers import Dense, Activation, Flatten, Input, merge
 from keras.optimizers import Adam
-
-import numpy as np
 
 from rl.agents import DDPGAgent
 from rl.memory import SequentialMemory
 from rl.random import OrnsteinUhlenbeckProcess
 
-from osim.env import *
-
-from keras.optimizers import RMSprop
+from osim.env import StandEnv, GaitEnv, CrouchEnv, HopEnv
 
 import argparse
-import math
 
 # Command line parameters
 parser = argparse.ArgumentParser(description='Train or test neural net motor controller')
+parser.add_argument('--env', dest='environment', action='store', default="StandEnv")
 parser.add_argument('--train', dest='train', action='store_true', default=True)
 parser.add_argument('--test', dest='train', action='store_false', default=True)
 parser.add_argument('--steps', dest='steps', action='store', default=10000)
 parser.add_argument('--visualize', dest='visualize', action='store_true', default=False)
 parser.add_argument('--model', dest='model', action='store', default="example.h5f")
+parser.add_argument('--update', dest='modelupdate', action='store_true', default=True)
+parser.add_argument('--overwrite', dest='modelupdate', action='store_false', default=True)
 args = parser.parse_args()
 
-# Load walking environment
-env = GaitEnv(args.visualize)
+# Load appropriate environment
+if args.environment == "StandEnv":
+    env = StandEnv(args.visualize)
+elif args.environment == "GaitEnv":
+    env = GaitEnv(args.visualize)
+elif args.environment == "HopEnv":
+    env = HopEnv(args.visualize)
+elif args.environment == "CrouchEnv":
+    env = CrouchEnv(args.visualize)
+else
+    exit()
 
 nb_actions = env.action_space.shape[0]
 
@@ -82,6 +84,8 @@ agent.compile(Adam(lr=.001, clipnorm=1.), metrics=['mae'])
 # slows down training quite a lot. You can always safely abort the training prematurely using
 # Ctrl + C.
 if args.train:
+    if args.modelupdate:
+        agent.load_weights(args.model)
     agent.fit(env, nb_steps=nallsteps, visualize=False, verbose=1, nb_max_episode_steps=env.timestep_limit, log_interval=10000)
     # After training is done, we save the final weights.
     agent.save_weights(args.model, overwrite=True)
