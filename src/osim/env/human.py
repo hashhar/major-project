@@ -32,9 +32,14 @@ class GaitEnv(OsimEnv):
     def is_pelvis_too_low(self):
         y = self.osim_model.joints[0].getCoordinate(2).getValue(self.osim_model.state)
         return (y < 0.7)
+    
+    def is_head_too_low(self):
+        y = self.getHead()
+        return (y[1] < 1.0)
 
     def is_done(self):
-        return self.is_pelvis_too_low()
+        #return (self.is_pelvis_too_low() or self.is_head_too_low())
+        return (self.is_pelvis_too_low())
 
     def __init__(self, visualize = True, noutput = None):
         super(GaitEnv, self).__init__(visualize = visualize, noutput = noutput)
@@ -66,10 +71,6 @@ class GaitEnv(OsimEnv):
         self.osim_model.bodies.append(self.osim_model.bodySet.get(10))
         self.osim_model.bodies.append(self.osim_model.bodySet.get(12))
         self.osim_model.bodies.append(self.osim_model.bodySet.get(0))
-
-        self.lforig = self.getFootL()
-        self.rforig = self.getFoorR()
-        self.horig = self.getHead()
 
     def get_observation(self):
         invars = np.array([0] * self.ninput, dtype='f')
@@ -135,6 +136,9 @@ class StandEnv(GaitEnv):
         a = abs(acc[0])**2 + abs(acc[1])**2 + abs(acc[2])**2
         v = abs(vel[0])**2 + abs(vel[1])**2 + abs(vel[2])**2
         rew = 50.0 - min(a,10.0) - min(v,40.0)
+        h = self.getHead()
+        if h[1] < 1.4:
+            rew = rew - 50.0
 
         return rew / 50.0
 
@@ -145,13 +149,8 @@ class StandEnv(GaitEnv):
         pos = self.osim_model.model.calcMassCenterPosition(self.osim_model.state)
         vel = self.osim_model.model.calcMassCenterVelocity(self.osim_model.state)
         acc = self.osim_model.model.calcMassCenterAcceleration(self.osim_model.state)
-        acc_com = 0.0
-        for a in acc:
-            acc_com += a**2
-
-        vel_com = 0.0
-        for v in vel:
-            vel_com += v**2
+        acc_com = acc[0]**2 + acc[1]**2 + acc[2]**2
+        vel_com = vel[0]**2 + vel[1]**2 + vel[2]**2
 
         legvel_com = self.osim_model.joints[0].getCoordinate(0).getSpeedValue(self.osim_model.state)**2 + self.osim_model.joints[1].getCoordinate(0).getSpeedValue(self.osim_model.state)**2
 
@@ -159,17 +158,13 @@ class StandEnv(GaitEnv):
         h = self.getHead()
         lf = self.getFootL()
         rf = self.getFootR()
-        deltah = 0.0
-        deltalf = 0.0
-        deltarf = 0.0
-        for i in range(2):
-            deltah += abs(h[i] - self.horig[i])
-            deltalf += abs(lf[i] - self.lforig[i])
-            deltarf += abs(rf[i] - self.rforig[i])
+        sum_com_vertical = abs(1.53 - abs(h[1]))
+        sum_com_horizontal = abs(10*h[0]) + abs(lf[0]) + abs(rf[0])
 
-        sum_com += deltah**2 + deltalf + deltarf
-        rew = 100.0 - acc_com - 2 * vel_com - sum_com - (legvel_com / 100)
-        return rew / 100.0
+        rew = acc_com + (vel_com*10) + (sum_com_vertical*10) + sum_com_horizontal + legvel_com
+        print('\t'+str(rew))
+        norm_rew = 100.0 - min(rew, 100.0)
+        return norm_rew / 100.0
 
 class HopEnv(GaitEnv):
     def __init__(self, visualize = True):
@@ -187,14 +182,26 @@ class HopEnv(GaitEnv):
     def activate_muscles(self, action):
         for j in range(9):
             muscle = self.osim_model.muscleSet.get(j)
-            muscle.setActivation(self.osim_model.state, action[j])
+            muscle.setActivation(self.osim_model.state, float(action[j]))
             muscle = self.osim_model.muscleSet.get(j + 9)
-            muscle.setActivation(self.osim_model.state, action[j])
+            muscle.setActivation(self.osim_model.state, float(action[j]))
 
 class CrouchEnv(HopEnv):
     def compute_reward(self):
-        y = self.osim_model.joints[0].getCoordinate(2).getValue(self.osim_model.state)
-        return 1.0 - (y-0.5) ** 3
+        pos = self.osim_model.model.calcMassCenterPosition(self.osim_model.state)
+        vel = self.osim_model.model.calcMassCenterVelocity(self.osim_model.state)
+        acc = self.osim_model.model.calcMassCenterAcceleration(self.osim_model.state)
+        a = abs(acc[0])**2 + abs(acc[1])**2 + abs(acc[2])**2
+        v = abs(vel[0])**2 + abs(vel[1])**2 + abs(vel[2])**2
+        rew = min(a,10.0) + min(v,40.0)
+        p = self.getPelvis()
+        h = self.getHead()
+        delta = abs(p[0] - h[0])
+        rew = rew + min((delta * 100), 50)
+        if p[1] > 0.8:
+            rew = rew + 50.0
+        norm_rew = 100.0 - min(rew, 100.0)
+        return rew / 100.0
 
     def is_head_too_low(self):
         y = self.osim_model.joints[0].getCoordinate(2).getValue(self.osim_model.state)

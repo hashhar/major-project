@@ -6,6 +6,10 @@ from rl.agents import DDPGAgent
 from rl.memory import SequentialMemory
 from rl.random import OrnsteinUhlenbeckProcess
 
+# from osim.env import StandEnv, GaitEnv, CrouchEnv, HopEnv
+import sys
+from os import path
+sys.path.append( path.dirname(path.dirname( path.abspath(__file__) ) ) )
 from osim.env import StandEnv, GaitEnv, CrouchEnv, HopEnv
 
 import argparse
@@ -37,7 +41,7 @@ else:
 nb_actions = env.action_space.shape[0]
 
 # Total number of steps in training
-nallsteps = args.steps
+nallsteps = int(args.steps)
 
 # Create networks for DDPG
 # Next, we build a very simple model.
