@@ -198,8 +198,7 @@ class CrouchEnv(HopEnv):
         h = self.getHead()
         delta = abs(p[0] - h[0])
         rew = rew + min((delta * 100), 50)
-        if p[1] > 0.8:
-            rew = rew + 50.0
+        rew = rew + min(((p[1] - 0.4) * 100), 50)
         norm_rew = 100.0 - min(rew, 100.0)
         return rew / 100.0
 
